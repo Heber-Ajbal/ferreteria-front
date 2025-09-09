@@ -1,40 +1,62 @@
+/* Reset y configuración base */
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Configuración dinámica por modo */
+:root:not(.dark) {
+  color-scheme: light;
+  color: #213547;
+  background-color: #ffffff;
+}
+
+:root.dark {
+  color-scheme: dark;
+  color: #f9fafb;
+  background-color: #111827;
+}
+
+/* Enlaces */
 a {
   font-weight: 500;
   color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #535bf2;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+:root.dark a {
+  color: #60a5fa;
 }
 
+:root.dark a:hover {
+  color: #93c5fd;
+}
+
+/* Body - SIN estilos fijos que interfieran */
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  /* REMOVIDOS: display: flex, place-items: center */
+  /* Estos conflictuaban con el layout de la app */
+}
+
+/* Títulos */
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
 
+/* Botones base */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -42,38 +64,115 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
 }
-button:hover {
+
+/* Botones en modo claro */
+:root:not(.dark) button {
+  background-color: #f9f9f9;
+  color: #213547;
+}
+
+:root:not(.dark) button:hover {
   border-color: #646cff;
 }
+
+/* Botones en modo oscuro */
+:root.dark button {
+  background-color: #1a1a1a;
+  color: #f9fafb;
+}
+
+:root.dark button:hover {
+  border-color: #646cff;
+}
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* Card */
 .card {
   padding: 2em;
 }
 
+/* App container - REMOVIDO text-align: center para no interferir */
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  /* REMOVIDOS: max-width: 1280px, margin: 0 auto, padding: 2rem, text-align: center */
+  /* Estos interferían con el layout responsive */
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* ============================================ */
+/* ESTILOS PARA DARK MODE - MEJORADOS */
+/* ============================================ */
+
+/* Transiciones suaves */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke, opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
 }
+
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* FORZAR estilos de modo claro */
+html:not(.dark) {
+  background-color: #ffffff !important;
+  color: #213547 !important;
+}
+
+html:not(.dark) body {
+  background-color: #ffffff !important;
+  color: #213547 !important;
+}
+
+/* FORZAR estilos de modo oscuro */
+html.dark {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+}
+
+html.dark body {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+}
+
+html.dark #app {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+}
+
+/* Asegurar que todos los elementos hereden correctamente */
+.dark * {
+  border-color: #374151;
+}
+
+.dark *:not([class*="bg-"]):not([class*="text-"]) {
+  background-color: inherit;
+  color: inherit;
+}
+
+/* Override para elementos específicos que podrían resistirse */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #374151 !important;
+  color: #f9fafb !important;
+  border-color: #4b5563 !important;
+}
+
+/* Media query REMOVIDA para evitar conflictos */
+/* @media (prefers-color-scheme: light) - ELIMINADA */
