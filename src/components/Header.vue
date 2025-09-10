@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useCartStore } from "../stores/cart";
 import { storeToRefs } from "pinia";
@@ -10,33 +10,6 @@ const cart = useCartStore();
 const { count } = storeToRefs(cart);
 
 const open = ref(false);
-const isDark = ref(false);
-
-onMounted(() => {
-  const savedDarkMode = localStorage.getItem("darkMode");
-  if (savedDarkMode !== null) {
-    isDark.value = savedDarkMode === "true";
-  } else {
-    isDark.value = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  }
-  applyDarkMode();
-});
-
-function applyDarkMode() {
-  if (isDark.value) {
-    document.documentElement.classList.add("dark");
-    document.body.classList.add("dark");
-  } else {
-    document.documentElement.classList.remove("dark");
-    document.body.classList.remove("dark");
-  }
-  localStorage.setItem("darkMode", isDark.value.toString());
-}
-
-function toggleDarkMode() {
-  isDark.value = !isDark.value;
-  applyDarkMode();
-}
 
 function go(path: string) {
   open.value = false;
@@ -50,7 +23,7 @@ function go(path: string) {
     <div
       class="absolute inset-0 bg-gradient-to-r from-pink-200/40 via-yellow-200/40 to-green-200/40 backdrop-blur-xl"
     ></div>
-    <div class="absolute inset-0 bg-white/80 dark:bg-gray-100/80"></div>
+    <div class="absolute inset-0 bg-white/80"></div>
 
     <!-- Línea inferior -->
     <div
@@ -58,7 +31,9 @@ function go(path: string) {
     ></div>
 
     <div class="relative mx-auto max-w-7xl px-4">
-      <FwbNavbar class="!bg-transparent !px-0 !py-4 flex flex-wrap justify-between items-center">
+      <FwbNavbar
+        class="!bg-transparent !px-0 !py-4 flex flex-wrap justify-between items-center"
+      >
         <!-- LOGO -->
         <template #logo>
           <FwbNavbarLogo href="/" @click.prevent="go('/')" class="group">
@@ -68,7 +43,9 @@ function go(path: string) {
               >
                 🛠️
               </div>
-              <span class="text-2xl font-extrabold tracking-tight !text-black">
+              <span
+                class="text-2xl font-extrabold tracking-tight !text-black"
+              >
                 Ferretería El Tornillo Feliz
               </span>
             </div>
@@ -102,13 +79,6 @@ function go(path: string) {
             >
               🔑 <span>Login</span>
             </RouterLink>
-
-            <button
-              @click="toggleDarkMode"
-              class="ml-4 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold !text-black bg-blue-300 hover:bg-blue-400 hover:!text-white transition-all duration-300"
-            >
-              {{ isDark ? "☀️ Claro" : "🌙 Oscuro" }}
-            </button>
 
             <RouterLink
               to="/cart"
@@ -165,12 +135,6 @@ function go(path: string) {
                 {{ count > 99 ? "99+" : count }}
               </span>
             </RouterLink>
-            <button
-              @click="toggleDarkMode"
-              class="mt-2 w-full px-4 py-3 rounded-lg font-bold !text-black bg-blue-300 hover:bg-blue-400 hover:!text-white transition-all duration-300"
-            >
-              {{ isDark ? "☀️ Modo Claro" : "🌙 Modo Oscuro" }}
-            </button>
           </FwbNavbarCollapse>
         </template>
       </FwbNavbar>
@@ -179,7 +143,6 @@ function go(path: string) {
 </template>
 
 <style scoped>
-/* Para animaciones de partículas si quieres mantenerlas */
 .animation-delay-0 {
   animation-delay: 0s;
 }

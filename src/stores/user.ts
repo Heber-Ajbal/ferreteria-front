@@ -49,4 +49,32 @@ export const useUserStore = defineStore("user", () => {
   const isAdmin = computed(() => user.value?.role === "admin");
 
   return { user, login, register, logout, isAuthenticated, isAdmin };
+
+
+
+
+  import { defineStore } from 'pinia';
+
+interface User {
+  id: number;
+  nombre: string;
+}
+
+export const useUserStore = defineStore('user', {
+  state: () => ({
+    user: null as User | null
+  }),
+  getters: {
+    isLogged: (state) => !!state.user
+  },
+  actions: {
+    login(nombre: string) {
+      this.user = { id: 1, nombre };
+    },
+    logout() {
+      this.user = null;
+    }
+  }
+});
+
 });
