@@ -103,13 +103,6 @@ function go(path: string) {
               🔑 <span>Login</span>
             </RouterLink>
 
-            <button
-              @click="toggleDarkMode"
-              class="ml-4 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold !text-black bg-blue-300 hover:bg-blue-400 hover:!text-white transition-all duration-300"
-            >
-              {{ isDark ? "☀️ Claro" : "🌙 Oscuro" }}
-            </button>
-
             <RouterLink
               to="/cart"
               class="group relative ml-3 flex items-center gap-2 px-6 py-3 rounded-2xl font-bold !text-black bg-purple-300 hover:bg-purple-400 hover:!text-white transition-all duration-300"
