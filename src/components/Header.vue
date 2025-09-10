@@ -72,6 +72,15 @@ function go(path: string) {
               🛠️ <span>Productos</span>
             </RouterLink>
 
+            <!-- BOTÓN ADMINISTRAR PRODUCTOS -->
+            <RouterLink
+              to="/products/admin"
+              class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold !text-black bg-blue-300 hover:bg-blue-400 hover:!text-white transition-all duration-300"
+              active-class="!bg-blue-500 !text-white"
+            >
+              ⚙️ <span>Administrar</span>
+            </RouterLink>
+
             <RouterLink
               to="/auth/login"
               class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold !text-black bg-green-300 hover:bg-green-400 hover:!text-white transition-all duration-300"
@@ -115,6 +124,14 @@ function go(path: string) {
             >
               🛠️ Productos
             </RouterLink>
+            <!-- ADMINISTRAR -->
+            <RouterLink
+              to="/products/admin"
+              class="block w-full px-4 py-3 rounded-lg font-bold !text-black bg-blue-300 hover:bg-blue-400 hover:!text-white transition-all duration-300"
+              active-class="!bg-blue-500 !text-white"
+            >
+              ⚙️ Administrar
+            </RouterLink>
             <RouterLink
               to="/auth/login"
               class="block w-full px-4 py-3 rounded-lg font-bold !text-black bg-green-300 hover:bg-green-400 hover:!text-white transition-all duration-300"
@@ -141,15 +158,3 @@ function go(path: string) {
     </div>
   </header>
 </template>
-
-<style scoped>
-.animation-delay-0 {
-  animation-delay: 0s;
-}
-.animation-delay-1000 {
-  animation-delay: 1s;
-}
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-</style>

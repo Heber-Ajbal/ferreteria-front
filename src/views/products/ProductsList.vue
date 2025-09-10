@@ -194,7 +194,4 @@ function addToCart(product: any) {
     qty: 1
   });
 }
-
-
-
 </script>
