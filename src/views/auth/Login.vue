@@ -1,3 +1,81 @@
+<script setup lang="ts">
+import { ref, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import api from "../../lib/api";
+
+const router = useRouter();
+const route = useRoute();
+
+const currentView = ref("login"); // login | register | dashboard
+const formData = ref({ name: "", email: "", password: "" });
+const errors = ref<Record<string, string | undefined>>({});
+const currentUser = ref<{ email: string } | null>(null);
+
+// 1) Intento de sesión persistida: si hay token, traigo /auth/me
+onMounted(async () => {
+  const token = localStorage.getItem("accessToken");
+  if (!token) return;
+  try {
+    const { data } = await api.get("/auth/profile"); // espera { id, email, role }
+    currentUser.value = { email: data.email };
+    currentView.value = "dashboard";
+  } catch {
+    localStorage.removeItem("accessToken");
+  }
+});
+
+// Login real contra backend
+async function handleLogin() {
+  errors.value = {};
+  try {
+    const { data } = await api.post("/auth/login", {
+      email: formData.value.email,
+      password: formData.value.password,
+    });
+
+    localStorage.setItem("accessToken", data.accessToken);
+    currentUser.value = { email: data.user.email };
+
+    const redirect = (route.query.redirect as string) || "/";
+    router.push(redirect);
+
+  } catch (e: any) {
+    errors.value = { general: e?.response?.data?.message || "Email o contraseña incorrectos" };
+  }
+}
+
+// Registro (si ya tienes endpoint). Si no, déjalo como está o deshabilítalo.
+async function handleRegister() {
+  errors.value = {};
+
+  if (!formData.value.email || !formData.value.password || !formData.value.name) {
+    errors.value = { general: "Todos los campos son obligatorios" };
+    return;
+  }
+
+  try {
+    const { data } = await api.post("/auth/register", {
+      fullName: formData.value.name,   // tu backend espera fullName
+      email: formData.value.email,
+      password: formData.value.password,
+    });
+
+    // data = { accessToken, user }
+    localStorage.setItem("accessToken", data.accessToken);
+    currentUser.value = { email: data.user.email };
+
+    // redirigir al home (o a redirect si venías de una ruta protegida)
+    const redirect = (route.query.redirect as string) || "/";
+    router.push(redirect);
+  } catch (e: any) {
+    const msg = e?.response?.data?.message || "No se pudo registrar";
+    errors.value = { general: Array.isArray(msg) ? msg.join(", ") : msg };
+  }
+}
+
+
+</script>
+
 <template>
   <div
     class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
@@ -153,81 +231,9 @@
           </p>
         </div>
       </form>
-
-      <!-- Dashboard -->
-      <div v-else class="text-center space-y-6">
-        <div class="p-6 bg-gray-50 rounded-xl shadow-inner">
-          <p class="text-gray-700">
-            ¡Hola <strong>{{ currentUser.email }}</strong>! Has iniciado sesión
-            correctamente.
-          </p>
-        </div>
-        <button
-          @click="handleLogout"
-          class="w-full py-2 px-4 rounded-lg text-white bg-red-500 hover:bg-red-600 shadow-md transition"
-        >
-          Cerrar Sesión
-        </button>
-      </div>
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref } from "vue";
-
-const currentView = ref("login"); // login | register | dashboard
-const formData = ref({ name: "", email: "", password: "" });
-const errors = ref({});
-const currentUser = ref(null);
-
-// Usuarios de prueba
-const testUsers = [
-  { email: "admin@example.com", password: "1234" },
-  { email: "empleado@example.com", password: "1234" },
-  { email: "cliente@example.com", password: "1234" },
-];
-
-// Login
-function handleLogin() {
-  const user = testUsers.find(
-    (u) =>
-      u.email === formData.value.email &&
-      u.password === formData.value.password
-  );
-  if (user) {
-    currentUser.value = user;
-    currentView.value = "dashboard";
-    errors.value = {};
-  } else {
-    errors.value = { general: "Email o contraseña incorrectos" };
-  }
-}
-
-// Registro
-function handleRegister() {
-  if (!formData.value.email || !formData.value.password || !formData.value.name) {
-    errors.value = { general: "Todos los campos son obligatorios" };
-    return;
-  }
-  const newUser = {
-    email: formData.value.email,
-    password: formData.value.password,
-    name: formData.value.name,
-  };
-  currentUser.value = newUser;
-  currentView.value = "dashboard";
-  errors.value = {};
-}
-
-// Logout
-function handleLogout() {
-  currentUser.value = null;
-  formData.value = { name: "", email: "", password: "" };
-  currentView.value = "login";
-}
-</script>
-
 <style>
 /* Animación de blobs en el fondo */
 @keyframes blob {
