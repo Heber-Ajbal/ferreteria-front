@@ -130,7 +130,7 @@ function next() { if (page.value * pageSize.value < total.value) { page.value++;
             </div>
 
             <RouterLink to="/products/new"
-              class="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
+              class="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 !text-white">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
@@ -193,11 +193,6 @@ function next() { if (page.value * pageSize.value < total.value) { page.value++;
         <div class="flex flex-col sm:flex-row gap-4">
           <div class="flex-1">
             <div class="relative">
-              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none"
-                stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
               <input v-model="search" @input="debouncedFetch" type="text"
                 placeholder="Buscar por nombre, SKU o código de barras…"
                 class="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-all duration-200" />
@@ -271,14 +266,18 @@ function next() { if (page.value * pageSize.value < total.value) { page.value++;
 
                 <td class="py-4 px-6">
                   <div class="flex justify-center gap-3">
-                    <button @click="editProduct(p.product_id)"
-                      class="flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white px-4 py-2.5 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-2xl">
+                    <button
+                      @click="editProduct(p.product_id)"
+                      class="flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 !text-white px-4 py-2.5 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-2xl">
                       ✏️ Editar
                     </button>
-                    <button @click="confirmDelete(p)"
-                      class="flex items-center gap-2 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white px-4 py-2.5 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-2xl">
+
+                    <button
+                      @click="confirmDelete(p)"
+                      class="flex items-center gap-2 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 !text-white px-4 py-2.5 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-2xl">
                       🗑️ Eliminar
                     </button>
+
                   </div>
                 </td>
               </tr>
