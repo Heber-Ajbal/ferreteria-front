@@ -6,31 +6,20 @@ import { storeToRefs } from "pinia";
 import { FwbNavbar, FwbNavbarCollapse, FwbNavbarLogo } from "flowbite-vue";
 import { useAuthStore } from "../stores/auth";
 
-
 const auth = useAuthStore();
-
 const router = useRouter();
 const cart = useCartStore();
 const { count } = storeToRefs(cart);
 
 const open = ref(false);
-
-function go(path: string) {
-  open.value = false;
-  router.push(path);
-}
+function go(path: string) { open.value = false; router.push(path); }
 </script>
 
 <template>
   <header class="sticky top-0 z-50 overflow-hidden">
-    <!-- Fondo con gradiente -->
-    <div class="absolute inset-0 bg-gradient-to-r from-pink-200/40 via-yellow-200/40 to-green-200/40 backdrop-blur-xl">
-    </div>
+    <div class="absolute inset-0 bg-gradient-to-r from-pink-200/40 via-yellow-200/40 to-green-200/40 backdrop-blur-xl"></div>
     <div class="absolute inset-0 bg-white/80"></div>
-
-    <!-- Línea inferior -->
-    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-pink-400 via-yellow-400 to-green-400">
-    </div>
+    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-pink-400 via-yellow-400 to-green-400"></div>
 
     <div class="relative mx-auto max-w-7xl px-4">
       <FwbNavbar class="!bg-transparent !px-0 !py-4 flex flex-wrap justify-between items-center">
@@ -38,13 +27,8 @@ function go(path: string) {
         <template #logo>
           <FwbNavbarLogo href="/" @click.prevent="go('/')" class="group">
             <div class="flex items-center gap-3">
-              <div
-                class="w-12 h-12 bg-gradient-to-br from-pink-300 via-yellow-300 to-green-300 rounded-2xl flex items-center justify-center shadow-lg">
-                🛠️
-              </div>
-              <span class="text-2xl font-extrabold tracking-tight !text-black">
-                Ferretería El Tornillo Feliz
-              </span>
+              <div class="w-12 h-12 bg-gradient-to-br from-pink-300 via-yellow-300 to-green-300 rounded-2xl flex items-center justify-center shadow-lg">🛠️</div>
+              <span class="text-2xl font-extrabold tracking-tight !text-black">Ferretería El Tornillo Feliz</span>
             </div>
           </FwbNavbarLogo>
         </template>
@@ -64,14 +48,25 @@ function go(path: string) {
               🛠️ <span>Productos</span>
             </RouterLink>
 
-            <!-- BOTÓN ADMINISTRAR PRODUCTOS -->
-            <RouterLink to="/products/admin"
+            <!-- ADMIN SOLO PARA ADMIN -->
+            <RouterLink
+              v-if="auth.isAdmin"
+              to="/products/admin"
               class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold !text-black bg-blue-300 hover:bg-blue-400 hover:!text-white transition-all duration-300"
               active-class="!bg-blue-500 !text-white">
               ⚙️ <span>Administrar</span>
             </RouterLink>
 
-            <RouterLink v-if="!auth.token" to="/auth/login"
+            <!-- USUARIOS SOLO PARA ADMIN -->
+            <RouterLink
+              v-if="auth.isAdmin"
+              to="/admin/users"
+              class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold !text-black bg-teal-300 hover:bg-teal-400 hover:!text-white transition-all duration-300"
+              active-class="!bg-teal-500 !text-white">
+              👤 <span>Usuarios</span>
+            </RouterLink>
+
+            <RouterLink v-if="!auth.isLoggedIn" to="/auth/login"
               class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold !text-black bg-green-300 hover:bg-green-400 hover:!text-white transition-all duration-300"
               active-class="!bg-green-500 !text-white">
               🔑 <span>Login</span>
@@ -100,22 +95,41 @@ function go(path: string) {
               active-class="!bg-pink-500 !text-white" exact>
               🏠 Inicio
             </RouterLink>
+
             <RouterLink to="/products"
               class="block w-full px-4 py-3 rounded-lg font-bold !text-black bg-yellow-300 hover:bg-yellow-400 hover:!text-white transition-all duration-300"
               active-class="!bg-yellow-500 !text-white">
               🛠️ Productos
             </RouterLink>
-            <!-- ADMINISTRAR -->
-            <RouterLink to="/products/admin"
+
+            <!-- ADMIN / USUARIOS SOLO ADMIN -->
+            <RouterLink
+              v-if="auth.isAdmin"
+              to="/products/admin"
               class="block w-full px-4 py-3 rounded-lg font-bold !text-black bg-blue-300 hover:bg-blue-400 hover:!text-white transition-all duration-300"
               active-class="!bg-blue-500 !text-white">
               ⚙️ Administrar
             </RouterLink>
-            <RouterLink to="/auth/login"
+
+            <RouterLink
+              v-if="auth.isAdmin"
+              to="/admin/users"
+              class="block w-full px-4 py-3 rounded-lg font-bold !text-black bg-teal-300 hover:bg-teal-400 hover:!text-white transition-all duration-300"
+              active-class="!bg-teal-500 !text-white">
+              👤 Usuarios
+            </RouterLink>
+
+            <RouterLink v-if="!auth.isLoggedIn" to="/auth/login"
               class="block w-full px-4 py-3 rounded-lg font-bold !text-black bg-green-300 hover:bg-green-400 hover:!text-white transition-all duration-300"
               active-class="!bg-green-500 !text-white">
               🔑 Login
             </RouterLink>
+
+            <button v-else @click="auth.logout"
+              class="block w-full px-4 py-3 rounded-lg font-bold bg-red-300 hover:bg-red-400 hover:!text-white transition-all duration-300 text-left">
+              🚪 Logout
+            </button>
+
             <RouterLink to="/cart"
               class="block w-full px-4 py-3 rounded-lg font-bold !text-black bg-purple-300 hover:bg-purple-400 hover:!text-white transition-all duration-300"
               active-class="!bg-purple-500 !text-white">

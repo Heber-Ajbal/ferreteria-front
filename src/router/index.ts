@@ -12,18 +12,42 @@ const routes = [
   { path: "/cart", name: "cart", component: CartPage },
   { path: "/auth/login", name: "login", component: Login },
 
-  // admin primero (rutas más específicas antes de las dinámicas)
-  { path: "/products/admin", name: "products-admin", component: () => import("../views/products/ProductsAdmin.vue"), meta: { requiresAuth: true } },
-  { path: "/products/new", name: "product-new", component: () => import("../views/products/ProductForm.vue"), meta: { requiresAuth: true } },
-  { path: "/products/edit/:id", name: "product-edit", component: () => import("../views/products/ProductForm.vue"), props: true, meta: { requiresAuth: true } },
+  // ADMIN: Usuarios (solo admins)
+  {
+    path: "/admin/users",
+    name: "users-admin",
+    component: () => import("../views/users/UsersAdmin.vue"),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
 
-  // detalle producto (lazy) con alias para /products/:id
+  // ADMIN productos (solo admins)
+  {
+    path: "/products/admin",
+    name: "products-admin",
+    component: () => import("../views/products/ProductsAdmin.vue"),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: "/products/new",
+    name: "product-new",
+    component: () => import("../views/products/ProductForm.vue"),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: "/products/edit/:id",
+    name: "product-edit",
+    component: () => import("../views/products/ProductForm.vue"),
+    props: true,
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+
+  // Detalle producto
   {
     path: "/product/:id",
     name: "product-detail",
     component: () => import("../views/products/ProductDetail.vue"),
-    alias: ["/products/:id"],                 // opcional
-    props: route => ({ id: Number(route.params.id) || route.params.id }) // opcional si quieres recibir "id" como prop
+    alias: ["/products/:id"],
+    props: (route) => ({ id: Number(route.params.id) || route.params.id }),
   },
 
   { path: "/:pathMatch(.*)*", redirect: "/" },
@@ -32,18 +56,27 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior() { return { top: 0 }; },   // 👈 sube al top al navegar
+  scrollBehavior() { return { top: 0 }; },
 });
 
-// guard de auth igual que tenías
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const auth = useAuthStore();
-  if (!auth.token) {
-    const token = localStorage.getItem("accessToken"); // ⚠️ usa la misma key que tu interceptor
-    if (token) auth.token = token;
-  }
-  const isLoggedIn = !!auth.token;
+
+  // hidratar sesión (token + user)
+  await auth.ensureSession();
+
+  const isLoggedIn = auth.isLoggedIn;
+  const isAdmin    = auth.isAdmin;
+
   if (to.name === "login" && isLoggedIn) return { name: "home" };
-  if (to.meta?.requiresAuth && !isLoggedIn) return { name: "login", query: { redirect: to.fullPath } };
+
+  if (to.meta?.requiresAuth && !isLoggedIn) {
+    return { name: "login", query: { redirect: to.fullPath } };
+  }
+
+  if (to.meta?.requiresAdmin && !isAdmin) {
+    return { name: "home" }; // o una /403 si quieres
+  }
 });
+
 export default router;
