@@ -12,6 +12,22 @@ export type Product = {
   // ...otros campos que uses
 };
 
+export type ProductPayload = {
+  sku: string;
+  name: string;
+  categoryId?: number;
+  brandId?: number;
+  unitId: number;
+  barcode?: string;
+  description?: string;
+  costPrice: number;
+  salePrice: number;
+  isTaxable: boolean;
+  minStock: number;
+  // imageUrl?: string; // si lo agregas en backend
+};
+
+
 export type ProductsResponse = {
   data: Product[];
   meta: { page: number; pageSize: number; total: number };
@@ -56,4 +72,50 @@ export async function getBrands() {
     { params: { page: 1, pageSize: 100 } }
   );
   return data.data.map(b => ({ id: b.brand_id, name: b.name }));
+}
+
+export async function getUnits() {
+  const { data } = await api.get("/catalog/units", { params: { pageSize: 500 } });
+  return (data?.data || []).map((u:any) => ({ id: u.unit_id, code: u.code, name: u.name })) as Array<{id:number; code:string; name:string}>;
+}
+
+export async function createProduct(payload: ProductPayload) {
+  const body = {
+    sku: payload.sku,
+    name: payload.name,
+    categoryId: payload.categoryId ?? undefined,
+    brandId: payload.brandId ?? undefined,
+    unitId: payload.unitId,
+    barcode: payload.barcode ?? undefined,
+    description: payload.description ?? undefined,
+    costPrice: payload.costPrice,
+    salePrice: payload.salePrice,
+    isTaxable: payload.isTaxable,
+    minStock: payload.minStock,
+  };
+  const { data } = await api.post("/catalog/products", body);
+  return data;
+}
+
+export async function updateProduct(id:number, payload: ProductPayload) {
+  const body = {
+    sku: payload.sku,
+    name: payload.name,
+    categoryId: payload.categoryId ?? undefined,
+    brandId: payload.brandId ?? undefined,
+    unitId: payload.unitId,
+    barcode: payload.barcode ?? undefined,
+    description: payload.description ?? undefined,
+    costPrice: payload.costPrice,
+    salePrice: payload.salePrice,
+    isTaxable: payload.isTaxable,
+    minStock: payload.minStock,
+  };
+  const { data } = await api.put(`/catalog/products/${id}`, body);
+  return data;
+}
+
+export async function deleteProduct(id:number) {
+  const { data } = await api.delete(`/catalog/products/${id}`);
+  return data;
 }
