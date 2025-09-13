@@ -11,6 +11,11 @@ const routes = [
   { path: "/products", name: "products", component: ProductsList },
   { path: "/cart", name: "cart", component: CartPage },
   { path: "/auth/login", name: "login", component: Login },
+  {
+    path: "/contacto",
+    name: "Contacto",
+    component: () => import("../views/Contact.vue"),
+  },
 
   // ADMIN: Usuarios (solo admins)
   {
@@ -66,7 +71,7 @@ router.beforeEach(async (to) => {
   await auth.ensureSession();
 
   const isLoggedIn = auth.isLoggedIn;
-  const isAdmin    = auth.isAdmin;
+  const isAdmin = auth.isAdmin;
 
   if (to.name === "login" && isLoggedIn) return { name: "home" };
 

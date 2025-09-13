@@ -3,7 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-   "engines": { "node": "20.19.0" },
+  "engines": {
+    "node": "20.19.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -11,6 +13,7 @@
     "type-check": "vue-tsc -b --noEmit"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@tailwindcss/vite": "^4.1.13",
     "@vicons/ionicons5": "^0.13.0",
     "axios": "^1.11.0",

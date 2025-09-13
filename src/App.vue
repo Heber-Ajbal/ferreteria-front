@@ -7,10 +7,6 @@
 
     <!-- Botón flotante visible en todas las páginas (salvo meta.hideFab) -->
     <WhatsAppFab v-if="showFab" />
-
-    <footer class="bg-gray-200 text-center py-4 text-sm">
-      © 2025 Mi Ferretería
-    </footer>
   </div>
 </template>
 

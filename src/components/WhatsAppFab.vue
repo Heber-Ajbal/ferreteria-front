@@ -3,7 +3,7 @@ import { computed } from "vue";
 
 // Toma el número y el texto desde .env (puedes hardcodear si prefieres)
 const phone = import.meta.env.VITE_WHATSAPP_PHONE ?? "50246771691";
-const message = import.meta.env.VITE_WHATSAPP_TEXT ?? "Hola quiero más información sobre la ferretería";
+const message = import.meta.env.VITE_WHATSAPP_TEXT ?? "Hola quiero más información sobre los productos disponibles";
 
 const href = computed(() =>
   `https://wa.me/${phone}?text=${encodeURIComponent(message)}`

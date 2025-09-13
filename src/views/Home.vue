@@ -129,7 +129,7 @@
         <a href="#inicio" class="hover:text-blue-600">Inicio</a>
         <a href="#servicios" class="hover:text-blue-600">Servicios</a>
         <a href="#productos" class="hover:text-blue-600">Productos</a>
-        <a href="#contacto" class="hover:text-blue-600">Contacto</a>
+        <RouterLink to="/contacto" class="hover:text-blue-600">Contacto</RouterLink>
       </div>
     </footer>
 
