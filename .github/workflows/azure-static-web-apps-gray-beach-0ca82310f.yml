@@ -1,8 +1,7 @@
 name: Azure Static Web Apps CI/CD
 
 on:
-  push:
-    branches: [ main ]
+  push: { branches: [ main ] }
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches: [ main ]
@@ -11,34 +10,35 @@ jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.19.3
 
-      - name: Build
+      - name: Install & Build
         run: |
           npm ci
           npm run build
+      # (opcional) ver qué quedó en dist
+      - name: List dist
+        run: ls -la dist
 
-      - name: Deploy
+      - name: Deploy (skip Oryx build)
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GRAY_BEACH_0CA82310F }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
-          app_location: "/"        # carpeta donde está index.html
-          skip_app_build: true  
-          output_location: "dist"  # salida de Vite
+          app_location: "/"              # raíz (donde está index.html)
+          skip_app_build: true           # no uses Oryx
+          app_artifact_location: "dist"  # sube SOLO la carpeta dist
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
     steps:
-      - name: Close Pull Request
-        uses: Azure/static-web-apps-deploy@v1
+      - uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GRAY_BEACH_0CA82310F }}
           action: close
