@@ -18,6 +18,10 @@ jobs:
           node-version: 20.19.3
 
       - name: Install & Build
+
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+      
         run: |
           npm ci
           npm run build
