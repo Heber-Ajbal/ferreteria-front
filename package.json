@@ -18,8 +18,11 @@
     "@vicons/ionicons5": "^0.13.0",
     "axios": "^1.11.0",
     "flowbite": "^3.1.2",
+    "jspdf": "^3.0.2",
+    "jspdf-autotable": "^5.0.2",
     "naive-ui": "^2.42.0",
     "pinia": "^3.0.3",
+    "qrcode": "^1.5.4",
     "sweetalert2": "^11.23.0",
     "vue": "^3.5.18",
     "vue-router": "^4.5.1"

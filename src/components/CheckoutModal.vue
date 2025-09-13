@@ -7,6 +7,8 @@ import "sweetalert2/dist/sweetalert2.min.css";                 // ⭐ NUEVO
 import type { CheckoutPayload } from "../services/sales";
 import { placeOrder } from "../services/sales";
 import { useAuthStore } from "../stores/auth";                 // ⭐ NUEVO
+import { generateReceiptPDF } from "../utils/receipt";
+
 
 type CartItem = { id: number | string; name: string; price?: number | null; qty: number };
 
@@ -98,12 +100,36 @@ function close() {
   setTimeout(() => emit("close"), 150);
 }
 
-async function submit() {
-  // ⭐ NUEVO: doble validación por si el modal ya estaba abierto
-  if (!(await ensureLoggedIn())) return;
+// async function submit() {
+//   // ⭐ NUEVO: doble validación por si el modal ya estaba abierto
+//   if (!(await ensureLoggedIn())) return;
 
+//   if (disabled.value) return;
+//   loading.value = true; err.value = "";
+//   try {
+//     const payload: CheckoutPayload = {
+//       items: props.items.map(i => ({ productId: i.id, quantity: i.qty, unitPrice: Number(i.price ?? 0) })),
+//       summary: { subtotal: Number(props.subtotal || 0), tax: Number(props.tax || 0), shipping: Number(props.shipping || 0), total: Number(props.total || 0) },
+//       customer: {
+//         name: name.value.trim(), phone: phone.value.trim(),
+//         email: email.value.trim() || undefined, nit: nit.value.trim() || undefined,
+//         address: deliveryMethod.value === "delivery" ? address.value.trim() : undefined,
+//       },
+//       delivery: { method: deliveryMethod.value },
+//       payment: { method: paymentMethod.value, reference: paymentMethod.value === "transfer" ? reference.value.trim() : undefined },
+//     };
+//     const resp = await placeOrder(payload);
+//     emit("submitted", resp); reset(); close();
+//   } catch (e: any) {
+//     err.value = e?.response?.data?.message || "No se pudo procesar la compra";
+//   } finally { loading.value = false; }
+// }
+
+async function submit() {
+  if (!(await ensureLoggedIn())) return;
   if (disabled.value) return;
   loading.value = true; err.value = "";
+
   try {
     const payload: CheckoutPayload = {
       items: props.items.map(i => ({ productId: i.id, quantity: i.qty, unitPrice: Number(i.price ?? 0) })),
@@ -116,12 +142,84 @@ async function submit() {
       delivery: { method: deliveryMethod.value },
       payment: { method: paymentMethod.value, reference: paymentMethod.value === "transfer" ? reference.value.trim() : undefined },
     };
+
     const resp = await placeOrder(payload);
-    emit("submitted", resp); reset(); close();
+    // 👇 Mapea el response a lo que requiere el PDF
+    const orderId = resp?.orderId || resp?.id || resp?.data?.id || Date.now(); // fallback
+    const items = props.items.map(i => ({
+      name: i.name,
+      qty: i.qty,
+      unitPrice: Number(i.price ?? 0),
+      total: Number(i.qty * Number(i.price ?? 0)),
+    }));
+
+    // (Opcional) mostrar un popup de éxito con botón para descargar
+    const result = await Swal.fire({
+      title: "¡Pedido confirmado!",
+      html: `
+        <div class="text-left text-sm leading-6">
+          <p class="mb-2">Tu pedido <b>#${orderId}</b> fue registrado correctamente.</p>
+          <p>Total: <b>${fmt(props.total)}</b></p>
+        </div>
+      `,
+      icon: "success",
+      showCancelButton: true,
+      confirmButtonText: "Descargar comprobante",
+      cancelButtonText: "Cerrar",
+      buttonsStyling: false,
+      customClass: {
+        popup: "rounded-2xl",
+        confirmButton: "rounded-lg bg-slate-900 text-white px-4 py-2 font-medium hover:bg-black focus:ring-2 focus:ring-slate-300",
+        cancelButton: "ml-2 rounded-lg border border-slate-300 px-4 py-2 font-medium hover:bg-slate-50",
+      },
+    });
+
+    if (result.isConfirmed) {
+      await generateReceiptPDF({
+        orderId,
+        issuedAt: new Date(),
+        company: {
+          name: "Ferretería La Buena",     // <-- pon el nombre real
+          nit: "1234567-8",                // <-- pon tu NIT si aplica
+          address: "Zona 1, Guatemala",
+          phone: "5555-5555",
+          email: "ventas@ferreteria.com",
+        },
+        customer: {
+          name: name.value,
+          phone: phone.value,
+          email: email.value || undefined,
+          nit: nit.value || undefined,
+          address: deliveryMethod.value === "delivery" ? address.value : undefined,
+        },
+        summary: {
+          subtotal: Number(props.subtotal || 0),
+          tax: Number(props.tax || 0),
+          shipping: Number(props.shipping || 0),
+          total: Number(props.total || 0),
+        },
+        items,
+        payment: {
+          method: paymentMethod.value,
+          reference: paymentMethod.value === "transfer" ? reference.value : undefined,
+        },
+        delivery: {
+          method: deliveryMethod.value,
+          address: deliveryMethod.value === "delivery" ? address.value : undefined,
+        },
+      });
+    }
+
+    emit("submitted", resp);
+    reset();
+    close();
   } catch (e: any) {
     err.value = e?.response?.data?.message || "No se pudo procesar la compra";
-  } finally { loading.value = false; }
+  } finally {
+    loading.value = false;
+  }
 }
+
 </script>
 
 <!-- Tu <template> y <style> quedan igual que el último que pegaste -->
