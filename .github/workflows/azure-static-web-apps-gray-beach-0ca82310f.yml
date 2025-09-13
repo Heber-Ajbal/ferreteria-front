@@ -21,19 +21,19 @@ jobs:
         run: |
           npm ci
           npm run build
-      # (opcional) ver qué quedó en dist
-      - name: List dist
+
+      - name: List dist (debug)
         run: ls -la dist
 
-      - name: Deploy (skip Oryx build)
+      - name: Deploy (upload only dist)
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GRAY_BEACH_0CA82310F }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
-          app_location: "/"              # raíz (donde está index.html)
-          skip_app_build: true           # no uses Oryx
-          app_artifact_location: "dist"  # sube SOLO la carpeta dist
+          app_location: "dist"          # ⬅️ sube SOLO la carpeta dist
+          skip_app_build: true          # ⬅️ NO dejes que Oryx reconstruya
+          config_file_location: "/"     # ⬅️ tu staticwebapp.config.json está en la raíz
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
