@@ -31,6 +31,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
           app_location: "/"        # carpeta donde está index.html
+          skip_app_build: true  
           output_location: "dist"  # salida de Vite
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
