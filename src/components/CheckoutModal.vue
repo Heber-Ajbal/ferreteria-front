@@ -182,7 +182,7 @@ async function submit() {
           name: "Ferretería La Buena",     // <-- pon el nombre real
           nit: "1234567-8",                // <-- pon tu NIT si aplica
           address: "Zona 1, Guatemala",
-          phone: "5555-5555",
+          phone: "46771691",
           email: "ventas@ferreteria.com",
         },
         customer: {
