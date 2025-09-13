@@ -15,15 +15,18 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20.19.3
+          node-version: '20.19.0'   # 👈 pin exacto para evitar EBADENGINE
+          cache: 'npm'
+
+      - name: Relax engines (opcional)
+        run: npm config set engine-strict false
 
       - name: Install & Build
-
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
-      
         run: |
-          npm ci
+          # Workaround Rollup + npm ci (npm issue #4828)
+          npm ci || (rm -rf node_modules package-lock.json && npm i)
           npm run build
 
       - name: List dist (debug)
@@ -37,7 +40,8 @@ jobs:
           action: upload
           app_location: "dist"          # ⬅️ sube SOLO la carpeta dist
           skip_app_build: true          # ⬅️ NO dejes que Oryx reconstruya
-          config_file_location: "/"     # ⬅️ tu staticwebapp.config.json está en la raíz
+          config_file_location: "/"     # ⬅️ staticwebapp.config.json en la raíz
+
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
