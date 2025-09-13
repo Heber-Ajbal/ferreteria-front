@@ -98,6 +98,7 @@ async function addToCart() {
       name: product.value.name,
       price: salePrice.value,
       qty: qty.value,
+      image_url: product.value.image_url
     });
   } finally {
     adding.value = false;
