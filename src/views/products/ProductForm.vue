@@ -1,6 +1,5 @@
-
 <script setup lang="ts">
-import { reactive, onMounted, computed, ref } from "vue";
+import { reactive, onMounted, computed, ref, onBeforeUnmount } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   getProduct,
@@ -9,7 +8,9 @@ import {
   getCategories,
   getBrands,
   getUnits,
-  type ProductPayload
+  type ProductPayload,
+  uploadProductImage,       // 👈 nuevo
+  clearProductImage,        // 👈 nuevo
 } from "../../services/products";
 
 const route = useRoute();
@@ -39,6 +40,44 @@ const form = reactive<ProductPayload>({
   minStock: 0
 });
 
+// ===== Imagen =====
+const currentImageUrl = ref<string | null>(null); // url actual del producto (si edita)
+const file = ref<File | null>(null);              // archivo nuevo
+const previewUrl = ref<string | null>(null);
+const imageError = ref("");
+const MAX_MB = 2;
+
+function onFileChange(e: Event) {
+  imageError.value = "";
+  const input = e.target as HTMLInputElement;
+  const f = input.files?.[0];
+  if (!f) return;
+
+  if (!f.type.startsWith("image/")) {
+    imageError.value = "El archivo debe ser una imagen.";
+    return;
+  }
+  if (f.size > MAX_MB * 1024 * 1024) {
+    imageError.value = `Tamaño máximo ${MAX_MB} MB.`;
+    return;
+  }
+
+  // set y preview
+  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value);
+  file.value = f;
+  previewUrl.value = URL.createObjectURL(f);
+}
+
+function clearNewFile() {
+  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value);
+  previewUrl.value = null;
+  file.value = null;
+}
+
+onBeforeUnmount(() => {
+  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value);
+});
+
 function resetForm() {
   if (!isEdit.value) {
     form.sku = "";
@@ -52,6 +91,8 @@ function resetForm() {
     form.salePrice = 0;
     form.isTaxable = true;
     form.minStock = 0;
+    clearNewFile();
+    currentImageUrl.value = null;
   }
 }
 
@@ -78,6 +119,8 @@ async function loadIfEdit() {
     form.salePrice = Number(p.sale_price || 0);
     form.isTaxable = !!p.is_taxable;
     form.minStock = Number(p.min_stock || 0);
+
+    currentImageUrl.value = p.image_url ?? null; // 👈 importante
   } catch (e:any) {
     error.value = e?.response?.data?.message || "No se pudo cargar el producto";
   }
@@ -90,6 +133,7 @@ onMounted(async () => {
 
 async function submitForm() {
   error.value = "";
+  imageError.value = "";
   submitting.value = true;
   try {
     const payload: ProductPayload = {
@@ -107,16 +151,49 @@ async function submitForm() {
     };
 
     if (isEdit.value) {
-      await updateProduct(Number(route.params.id), payload);
+      const id = Number(route.params.id);
+      await updateProduct(id, payload);
+
+      // si seleccionó imagen nueva, súbela
+      if (file.value) {
+        const url = await uploadProductImage(id, file.value);
+        currentImageUrl.value = url;
+        clearNewFile();
+      }
     } else {
-      await createProduct(payload);
+      // crear y luego subir imagen
+      const created = await createProduct(payload);
+      const id = created?.product_id ?? created?.id;
+      if (!id) throw new Error("No se recibió el ID del producto creado");
+
+      if (file.value) {
+        const url = await uploadProductImage(id, file.value);
+        currentImageUrl.value = url;
+        clearNewFile();
+      }
     }
 
     router.push("/products/admin");
   } catch (e:any) {
-    error.value = e?.response?.data?.message || "No se pudo guardar el producto";
+    error.value = e?.response?.data?.message || e?.message || "No se pudo guardar el producto";
   } finally {
     submitting.value = false;
+  }
+}
+
+async function removeCurrentImage() {
+  try {
+    if (!isEdit.value) {
+      // si está creando y aún no existe en backend, solo limpia selección/preview
+      clearNewFile();
+      currentImageUrl.value = null;
+      return;
+    }
+    const id = Number(route.params.id);
+    await clearProductImage(id);
+    currentImageUrl.value = null;
+  } catch (e:any) {
+    error.value = e?.response?.data?.message || "No se pudo quitar la imagen";
   }
 }
 </script>
@@ -222,6 +299,28 @@ async function submitForm() {
                 <input type="checkbox" v-model="form.isTaxable" class="w-4 h-4 text-blue-600 rounded border-gray-300">
                 <span class="text-gray-700">Sí</span>
               </label>
+            </div>
+
+            <!-- ===== Imagen del producto ===== -->
+            <div class="group">
+              <label class="flex items-center gap-2 text-gray-700 font-semibold mb-2">Imagen del producto</label>
+              <input type="file" accept="image/*" @change="onFileChange"
+                     class="block w-full text-sm file:mr-4 file:rounded-xl file:border file:px-4 file:py-2" />
+              <p v-if="imageError" class="text-sm text-red-600 mt-1">{{ imageError }}</p>
+
+              <!-- preview de nueva selección -->
+              <div v-if="previewUrl" class="mt-3 flex items-center gap-3">
+                <img :src="previewUrl" class="h-28 w-28 object-cover rounded-xl border" />
+                <button type="button" class="text-sm underline" @click="clearNewFile">Quitar nueva</button>
+              </div>
+
+              <!-- imagen actual si no hay nueva -->
+              <div v-else-if="currentImageUrl" class="mt-3 flex items-center gap-3">
+                <img :src="currentImageUrl" class="h-28 w-28 object-cover rounded-xl border" />
+                <button type="button" class="text-sm text-red-600 underline" @click="removeCurrentImage">
+                  Quitar imagen actual
+                </button>
+              </div>
             </div>
           </div>
 

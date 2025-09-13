@@ -24,9 +24,7 @@ export type ProductPayload = {
   salePrice: number;
   isTaxable: boolean;
   minStock: number;
-  // imageUrl?: string; // si lo agregas en backend
 };
-
 
 export type ProductsResponse = {
   data: Product[];
@@ -42,7 +40,6 @@ export async function getProducts(params: {
 }): Promise<ProductsResponse> {
   const res = await api.get("/catalog/products", { params });
 
-  // Soporta { data, meta } (backend) y también { items, meta } por si algo quedó cacheado
   const lvl1 = res?.data ?? {};
   const rows = Array.isArray(lvl1.data) ? lvl1.data : (Array.isArray(lvl1.items) ? lvl1.items : []);
   const meta = lvl1.meta ?? { page: params.page ?? 1, pageSize: params.pageSize ?? 20, total: rows.length };
@@ -52,12 +49,10 @@ export async function getProducts(params: {
 
 export async function getProduct(id: number) {
   const res = await api.get(`/catalog/products/${id}`);
-  return res.data; 
+  return res.data;
 }
 
-
 export async function getCategories() {
-  // Si ya tienes endpoint /catalog/categories
   const { data } = await api.get<{ data: Array<{ category_id: number; name: string }> }>(
     "/catalog/categories",
     { params: { page: 1, pageSize: 100 } }
@@ -66,7 +61,6 @@ export async function getCategories() {
 }
 
 export async function getBrands() {
-  // Si ya tienes endpoint /catalog/brands
   const { data } = await api.get<{ data: Array<{ brand_id: number; name: string }> }>(
     "/catalog/brands",
     { params: { page: 1, pageSize: 100 } }
@@ -118,4 +112,21 @@ export async function updateProduct(id:number, payload: ProductPayload) {
 export async function deleteProduct(id:number) {
   const { data } = await api.delete(`/catalog/products/${id}`);
   return data;
+}
+
+/* ====== NUEVO: imagen ====== */
+
+// Sube la imagen del producto (multipart/form-data) y devuelve la URL guardada
+export async function uploadProductImage(productId: number, file: File) {
+  const fd = new FormData();
+  fd.append("file", file);
+  const { data } = await api.post<{ image_url: string }>(`/catalog/products/${productId}/image`, fd, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data.image_url;
+}
+
+// Limpia la imagen del producto (setea image_url = null)
+export async function clearProductImage(productId: number) {
+  await api.delete(`/catalog/products/${productId}/image`);
 }
