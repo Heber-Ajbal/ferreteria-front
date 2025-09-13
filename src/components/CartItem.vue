@@ -37,7 +37,7 @@ function onInput(e: Event) {
     <div class="flex gap-6">
       <div class="relative flex-shrink-0">
         <div class="w-32 h-32 rounded-2xl overflow-hidden shadow-md">
-          <img :src="item.image || placeholder" :alt="item.name" class="w-full h-full object-cover"/>
+          <img :src="item.image_url || placeholder" :alt="item.name" class="w-full h-full object-cover"/>
         </div>
         <div class="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
           En Stock

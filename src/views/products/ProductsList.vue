@@ -137,7 +137,7 @@ const toIdx = computed(() => {
 
 // carrito
 function addToCart(p: Product) {
-  cart.add({ id: p.product_id, name: p.name, price: p.sale_price, qty: 1 });
+  cart.add({ id: p.product_id, name: p.name, price: p.sale_price, qty: 1,image_url:p.image_url });
 }
 
 // navegación a detalle

@@ -5,7 +5,7 @@ export type CartItem = {
   name: string;
   price: number;   // en tu moneda
   qty: number;
-  image?: string;
+  image_url?: string;
 };
 
 type State = {
