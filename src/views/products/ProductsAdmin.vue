@@ -272,11 +272,7 @@ function next() { if (page.value * pageSize.value < total.value) { page.value++;
                       ✏️ Editar
                     </button>
 
-                    <button
-                      @click="confirmDelete(p)"
-                      class="flex items-center gap-2 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 !text-white px-4 py-2.5 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-2xl">
-                      🗑️ Eliminar
-                    </button>
+                   
 
                   </div>
                 </td>

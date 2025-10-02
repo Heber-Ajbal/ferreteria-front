@@ -79,6 +79,29 @@ const variants = {
             </a>
           </RouterLink>
 
+          <!-- NUEVOS: enlaces admin -->
+          <RouterLink v-if="auth.isAdmin" to="/admin/dashboard" custom v-slot="{ isActive, navigate, href }">
+            <a :href="href" @click="navigate" :aria-current="isActive ? 'page' : undefined"
+               :class="[baseLink, variants.blue.base, isActive && variants.blue.active]">
+              📊 <span>Dashboard</span>
+            </a>
+          </RouterLink>
+
+          <RouterLink v-if="auth.isAdmin" to="/admin/purchases" custom v-slot="{ isActive, navigate, href }">
+            <a :href="href" @click="navigate" :aria-current="isActive ? 'page' : undefined"
+               :class="[baseLink, variants.green.base, isActive && variants.green.active]">
+              🧾 <span>Compras</span>
+            </a>
+          </RouterLink>
+
+          <RouterLink v-if="auth.isAdmin" to="/admin/stock" custom v-slot="{ isActive, navigate, href }">
+            <a :href="href" @click="navigate" :aria-current="isActive ? 'page' : undefined"
+               :class="[baseLink, variants.yellow.base, isActive && variants.yellow.active]">
+              📦 <span>Stock</span>
+            </a>
+          </RouterLink>
+          <!-- /NUEVOS -->
+
           <RouterLink v-if="!auth.isLoggedIn" to="/auth/login" custom v-slot="{ isActive, navigate, href }">
             <a :href="href" @click="navigate" :aria-current="isActive ? 'page' : undefined"
                :class="[baseLink, variants.green.base, isActive && variants.green.active]">
@@ -152,6 +175,23 @@ const variants = {
             <a :href="href" @click="navigate(); open = false"
                :class="['block w-full', baseLink, variants.teal.base]">👤 Usuarios</a>
           </RouterLink>
+
+          <!-- NUEVOS: enlaces admin (móvil) -->
+          <RouterLink v-if="auth.isAdmin" to="/admin/dashboard" custom v-slot="{ href, navigate }">
+            <a :href="href" @click="navigate(); open = false"
+               :class="['block w-full', baseLink, variants.blue.base]">📊 Dashboard</a>
+          </RouterLink>
+
+          <RouterLink v-if="auth.isAdmin" to="/admin/purchases" custom v-slot="{ href, navigate }">
+            <a :href="href" @click="navigate(); open = false"
+               :class="['block w-full', baseLink, variants.green.base]">🧾 Compras</a>
+          </RouterLink>
+
+          <RouterLink v-if="auth.isAdmin" to="/admin/stock" custom v-slot="{ href, navigate }">
+            <a :href="href" @click="navigate(); open = false"
+               :class="['block w-full', baseLink, variants.yellow.base]">📦 Stock</a>
+          </RouterLink>
+          <!-- /NUEVOS -->
 
           <RouterLink v-if="!auth.isLoggedIn" to="/auth/login" custom v-slot="{ href, navigate }">
             <a :href="href" @click="navigate(); open = false"

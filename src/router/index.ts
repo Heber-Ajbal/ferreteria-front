@@ -17,6 +17,34 @@ const routes = [
     component: () => import("../views/Contact.vue"),
   },
 
+  // =========================
+  // ADMIN: Paneles y gestión
+  // =========================
+
+  // Dashboard de ventas (solo admins)
+  {
+    path: "/admin/dashboard",
+    name: "admin-dashboard",
+    component: () => import("../views/admin/Dashboard.vue"),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+
+  // Compras: crear y recibir (solo admins)
+  {
+    path: "/admin/purchases",
+    name: "admin-purchases",
+    component: () => import("../views/admin/Purchases.vue"),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+
+  // Stock / existencias (solo admins o inventario)
+  {
+    path: "/admin/stock",
+    name: "admin-stock",
+    component: () => import("../views/admin/Stock.vue"),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+
   // ADMIN: Usuarios (solo admins)
   {
     path: "/admin/users",
@@ -61,7 +89,9 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior() { return { top: 0 }; },
+  scrollBehavior() {
+    return { top: 0 };
+  },
 });
 
 router.beforeEach(async (to) => {

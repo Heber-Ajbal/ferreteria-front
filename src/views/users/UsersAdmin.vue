@@ -194,7 +194,7 @@ onMounted(load);
                     <th class="px-4 py-3 text-left text-[11px] font-semibold tracking-wide uppercase text-slate-600">Email</th>
                     <th class="px-4 py-3 text-left text-[11px] font-semibold tracking-wide uppercase text-slate-600">Roles</th>
                     <th class="px-4 py-3 text-left text-[11px] font-semibold tracking-wide uppercase text-slate-600">Estado</th>
-                    <th class="px-4 py-3"></th>
+                    <th class="px-4 py-3">Accion</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -229,7 +229,6 @@ onMounted(load);
                     <td class="px-4 py-3 text-right">
                       <div class="inline-flex gap-2">
                         <button class="px-3 py-1.5 rounded-lg border text-sm hover:bg-slate-50" @click="openEdit(u)">Editar</button>
-                        <button class="px-3 py-1.5 rounded-lg border text-sm text-rose-700 hover:bg-rose-50 border-rose-200" @click="onDelete(u)">Eliminar</button>
                       </div>
                     </td>
                   </tr>
