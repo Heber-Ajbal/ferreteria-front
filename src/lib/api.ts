@@ -2,7 +2,7 @@ import axios from 'axios';
 
 
 const api = axios.create({
-baseURL: 'ferreteria-api-production.up.railway.app',
+baseURL: 'https://ferreteria-api-production.up.railway.app/',
 headers: { 'Content-Type': 'application/json' },
 });
 
