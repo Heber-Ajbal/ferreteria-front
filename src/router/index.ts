@@ -28,6 +28,7 @@ const routes = [
     component: () => import("../views/admin/Dashboard.vue"),
     meta: { requiresAuth: true, requiresAdmin: true },
   },
+  
 
   // Compras: crear y recibir (solo admins)
   {
